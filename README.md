@@ -25,5 +25,5 @@ MoJar is a collaborative financial management Android application designed to he
 3. Build and run on an Android device or emulator.
 
 
-Author
+## Author
 Liel Razayev
