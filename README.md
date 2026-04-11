@@ -1,5 +1,4 @@
-# MoJar 🍯
-
+# MoJar 💰📈
 MoJar is a collaborative financial management Android application designed to help households track expenses, set savings goals, and visualize their financial health in real-time.
 
 ## ✨ Features
