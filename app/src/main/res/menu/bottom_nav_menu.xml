@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/nav_dashboard"
+        android:icon="@drawable/ic_today"
+        android:title="Dashboard" />
+
+    <item
+        android:id="@+id/nav_reports"
+        android:icon="@drawable/ic_report"
+        android:title="Reports" />
+
+    <item
+        android:id="@+id/nav_savings"
+        android:icon="@drawable/ic_save"
+        android:title="Savings" />
+
+    <item
+        android:id="@+id/nav_accounts"
+        android:icon="@drawable/ic_people"
+        android:title="Accounts" />
+</menu>

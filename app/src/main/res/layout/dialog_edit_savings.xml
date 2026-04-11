@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="24dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/savings_settings"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:textColor="#4A4A4A"
+        android:layout_marginBottom="20dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/overall_savings_goal_total"
+        android:textSize="14sp"
+        android:textColor="#888888"
+        android:layout_marginBottom="4dp"/>
+
+    <EditText
+        android:id="@+id/etTotalGoal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/e_g_20000"
+        android:inputType="numberDecimal"
+        android:padding="12dp"
+        android:background="@android:drawable/edit_text"
+        android:layout_marginBottom="16dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/monthly_contribution_plan"
+        android:textSize="14sp"
+        android:textColor="#888888"
+        android:layout_marginBottom="4dp"/>
+
+    <EditText
+        android:id="@+id/etMonthlyContribution"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/e_g_1000"
+        android:inputType="numberDecimal"
+        android:padding="12dp"
+        android:background="@android:drawable/edit_text"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/enter_values_to_update_your_savings_plan"
+        android:textSize="12sp"
+        android:textColor="#BDBDBD"
+        android:layout_marginTop="12dp"
+        android:textAlignment="center"/>
+
+</LinearLayout>
