@@ -21,6 +21,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
 import java.util.Calendar
+import com.google.firebase.auth.FirebaseAuth
 
 class AddFragment : Fragment() {
 
@@ -34,6 +35,7 @@ class AddFragment : Fragment() {
     // Firebase Listeners for real-time synchronization
     private var categoriesListener: ListenerRegistration? = null
     private var transactionsListener: ListenerRegistration? = null
+    private var currentHouseholdId: String? = null
 
     companion object {
         fun newInstance(type: String, month: Int): AddFragment {
@@ -90,38 +92,47 @@ class AddFragment : Fragment() {
         transactionsListener?.remove()
 
         val currentYear = Calendar.getInstance().get(Calendar.YEAR)
-        // Step 1: Listen to Categories of the selected type
-        categoriesListener = db.collection("categories")
-            .whereEqualTo("type", currentType)
-            .addSnapshotListener { catSnapshot, _ ->
-                if (_binding == null || !isAdded) return@addSnapshotListener
-                val categories = catSnapshot?.toObjects(Category::class.java) ?: listOf()
+        val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
 
-                // Step 2: Listen to Transactions to calculate totals per category
-                transactionsListener = db.collection("transactions")
-                    .addSnapshotListener { transSnapshot, _ ->
+        db.collection("users").document(userId).get()
+            .addOnSuccessListener { userDoc ->
+
+                currentHouseholdId = userDoc.getString("householdId") ?: return@addOnSuccessListener
+
+                categoriesListener = db.collection("categories")
+                    .whereEqualTo("type", currentType)
+                    .addSnapshotListener { catSnapshot, _ ->
                         if (_binding == null || !isAdded) return@addSnapshotListener
-                        val allTransactions =
-                            transSnapshot?.toObjects(Transaction::class.java) ?: listOf()
 
-                        // Filter transactions by the selected month/year
-                        val filteredTrans = allTransactions.filter {
-                            val cal = Calendar.getInstance().apply { timeInMillis = it.date }
-                            cal.get(Calendar.MONTH) == selectedMonth && cal.get(Calendar.YEAR) == currentYear
-                        }
+                        val categories = catSnapshot?.toObjects(Category::class.java) ?: listOf()
 
-                        // Calculate sum for each category dynamically
-                        categories.forEach { category ->
-                            category.totalAmount = filteredTrans
-                                .filter { it.categoryName == category.name }
-                                .sumOf { it.amount }
-                        }
+                        transactionsListener = db.collection("transactions")
+                            .whereEqualTo("householdId", currentHouseholdId)
+                            .addSnapshotListener { transSnapshot, _ ->
+                                if (_binding == null || !isAdded) return@addSnapshotListener
 
-                        // Update the adapter with the fresh data and click logic
-                        val adapter = CategoryGridAdapter(categories) { category ->
-                            showCategoryDetails(category)
-                        }
-                        binding.rvCategoriesGrid.adapter = adapter
+                                val allTransactions =
+                                    transSnapshot?.toObjects(Transaction::class.java) ?: listOf()
+
+                                val filteredTrans = allTransactions.filter {
+                                    val cal = Calendar.getInstance().apply { timeInMillis = it.date }
+                                    cal.get(Calendar.MONTH) == selectedMonth &&
+                                            cal.get(Calendar.YEAR) == currentYear &&
+                                            it.type == currentType
+                                }
+
+                                categories.forEach { category ->
+                                    category.totalAmount = filteredTrans
+                                        .filter { it.categoryName == category.name }
+                                        .sumOf { it.amount }
+                                }
+
+                                val adapter = CategoryGridAdapter(categories) { category ->
+                                    showCategoryDetails(category)
+                                }
+
+                                binding.rvCategoriesGrid.adapter = adapter
+                            }
                     }
             }
     }
@@ -139,6 +150,7 @@ class AddFragment : Fragment() {
         tvTitle.text = "Transactions: ${category.name}"
 
         db.collection("transactions")
+            .whereEqualTo("householdId", currentHouseholdId)
             .whereEqualTo("categoryName", category.name)
             .whereEqualTo("type", currentType)
             .addSnapshotListener { snapshot, _ ->
